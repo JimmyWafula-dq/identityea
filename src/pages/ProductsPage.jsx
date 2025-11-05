@@ -3,49 +3,50 @@ import React, { useState, useMemo } from "react";
 import { Heart, Star, Search, Filter, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import AppLayout from "@/layout/AppLayout";
+import ProductCard from "@/components/ui/productcard";
 
 // Reusable Product Card Component
-const ProductCard = ({ product }) => (
-  <Link
-    to={`/view/${product.name}`}
-    // send data to next page in state
-    state={{ product }}
-    className="group flex flex-col"
-  >
-    <div className="bg-gray-50 rounded-2xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
-      <img
-        src={product.image}
-        alt={product.name}
-        className="max-h-full max-w-full object-contain"
-      />
-    </div>
+// const ProductCard = ({ product }) => (
+//   <Link
+//     to={`/view/${product.name}`}
+//     // send data to next page in state
+//     state={{ product }}
+//     className="group flex flex-col"
+//   >
+//     <div className="bg-gray-50 rounded-2xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+//       <img
+//         src={product.image}
+//         alt={product.name}
+//         className="max-h-full max-w-full object-contain"
+//       />
+//     </div>
 
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
-        <button className="text-gray-400 hover:text-red-500 transition">
-          <Heart className="w-5 h-5" />
-        </button>
-      </div>
+//     <div className="space-y-2">
+//       <div className="flex items-center justify-between">
+//         <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
+//         <button className="text-gray-400 hover:text-red-500 transition">
+//           <Heart className="w-5 h-5" />
+//         </button>
+//       </div>
 
-      <div className="flex justify-start">
-        {[...Array(product.rating)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-        ))}
-      </div>
+//       <div className="flex justify-start">
+//         {[...Array(product.rating)].map((_, i) => (
+//           <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+//         ))}
+//       </div>
 
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-lg font-bold text-gray-900">
-          ${product.salePrice}
-        </span>
-        <span className="text-gray-400 line-through">
-          ${product.originalPrice}
-        </span>
-        <span className="text-red-600 font-medium">{product.discount}</span>
-      </div>
-    </div>
-  </Link>
-);
+//       <div className="flex items-center gap-2 text-sm">
+//         <span className="text-lg font-bold text-gray-900">
+//           ${product.salePrice}
+//         </span>
+//         <span className="text-gray-400 line-through">
+//           ${product.originalPrice}
+//         </span>
+//         <span className="text-red-600 font-medium">{product.discount}</span>
+//       </div>
+//     </div>
+//   </Link>
+// );
 
 export default function ProductsPage() {
   // Full product list
@@ -352,7 +353,7 @@ export default function ProductsPage() {
               </div>
 
               {/* Product Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2">
                 {sortedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

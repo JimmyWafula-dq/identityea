@@ -52,10 +52,10 @@ export default function Products() {
           {products.map((product, index) => (
             <div
               key={index}
-              className="group flex flex-col items-center text-center"
+              className="group flex flex-col items-center text-center bg-white-100 ring-1 ring-gray-200 rounded-lg p-3 shadow-sm group-hover:shadow-md transition-shadow "
             >
               {/* Image Container */}
-              <div className="bg-gray-50 rounded-2xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+              <div className="bg-gray-50 rounded-2xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}

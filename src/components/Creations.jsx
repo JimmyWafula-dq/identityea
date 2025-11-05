@@ -65,7 +65,7 @@ export default function Creations() {
             className="size-56 object-cover object-top"
           />
           <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <h1 className="text-xl font-medium">Image Title</h1>
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
             <a
               href="#"
               className="flex items-center gap-1 text-sm text-white/70"
