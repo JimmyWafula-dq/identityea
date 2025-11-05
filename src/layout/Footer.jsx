@@ -68,7 +68,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="py-4 text-center border-t mt-6 border-slate-200">
-          Copyright 2025 © <a href="https://prebuiltui.com">PrebuiltUI</a> All
+          Copyright {new Date().getFullYear()} © <a href="/">identityea</a> All
           Right Reserved.
         </p>
       </footer>

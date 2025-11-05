@@ -7,6 +7,7 @@ import Creations from "@/components/Creations";
 import { Faq } from "@/components/Faq";
 import Promotional from "@/components/Promotional";
 import Testimonials from "@/components/Testimonials";
+import Products from "@/sections/Products";
 
 const HomePage = () => {
   return (
@@ -14,6 +15,7 @@ const HomePage = () => {
       <AppLayout>
         <div className="w-full">
           <Hero />
+          <Products />
           <Creations />
           {/* <Promotional /> */}
           <Testimonials />
