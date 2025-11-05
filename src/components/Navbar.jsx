@@ -8,7 +8,7 @@ const Navbar = () => {
   const { itemCount } = useCart();
   console.log("itemCount", itemCount);
   return (
-    <div className="bg-black w-full sm:px-16 px-6 py-3 animate-fade-up animate-duration-[2000ms]">
+    <div className="bg-black w-full sm:px-16 py-3 animate-fade-up animate-duration-[2000ms]">
       <nav class="z-50 flex items-center justify-between w-full px-6 md:px-6 backdrop-blur text-white text-sm">
         <a href="/">
           <Logo />

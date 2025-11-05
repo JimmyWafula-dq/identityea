@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function Promotional() {
   return (
-    <div className="flex flex-col w-full md:flex-row items-center justify-around text-sm border border-gray-300 rounded-md m-2 max-w-7xl w-full bg-white">
+    <div className="flex flex-col w-full md:flex-row items-center justify-around text-sm border border-gray-300 rounded-md  md:max-w-7xl w-full bg-white">
       <div className="flex flex-col text-center md:text-left items-center md:items-start pt-14 md:p-10">
         <h2 className="md:text-4xl text-2xl font-semibold text-gray-800">
           Don't miss out on the latest trends

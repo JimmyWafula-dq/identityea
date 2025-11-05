@@ -8,7 +8,7 @@ const AppLayout = ({ children }) => {
     <div>
       <Banner />
       <Navbar />
-      <div className="w-full sm:px-16 px-6 min-h-screen">{children}</div>
+      <div className="w-full sm:px-16 min-h-screen">{children}</div>
       <Footer />
       <a
         href="https://wa.me/254720575757"

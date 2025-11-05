@@ -8,7 +8,6 @@ export default function Creations() {
                     font-family: 'Poppins', sans-serif;
                 }
             `}</style>
-
       <h1 className="text-3xl font-semibold text-center mx-auto">
         Our Latest Creations
       </h1>
@@ -16,48 +15,341 @@ export default function Creations() {
         A visual collection of our most recent works - each piece crafted with
         intention, emotion, and style.
       </p>
-
-      <div className="flex items-center gap-6 h-[400px] w-full max-w-5xl mt-10 mx-auto">
-        <div className="relative group flex-grow transition-all w-56 h-[400px] duration-500 hover:w-full">
+      <div className="flex flex-wrap items-center justify-center mt-12 gap-4 max-w-5xl mx-auto">
+        <div className="relative group rounded-lg overflow-hidden">
           <img
-            className="h-full w-full object-cover object-center"
-            src="https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGV2ZW50c3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600"
+            src="../images/band2.jpeg"
             alt="image"
+            className="size-56 object-cover object-top"
           />
-          <div className="absolute inset-0 flex flex-col justify-end p-10 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <h1 className="text-3xl">Prompt engineers</h1>
-            <p className="text-sm">
-              Bridging the gap between human intent and machine understanding
-              through expert prompt design.
-            </p>
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
           </div>
         </div>
-        <div className="relative group flex-grow transition-all w-56 h-[400px] duration-500 hover:w-full">
+        <div className="relative group rounded-lg overflow-hidden">
           <img
-            className="h-full w-full object-cover object-right"
-            src="https://images.pexels.com/photos/2263436/pexels-photo-2263436.jpeg"
+            src="../images/band1.jpeg"
             alt="image"
+            className="size-56 object-cover object-top"
           />
-          <div className="absolute inset-0 flex flex-col justify-end p-10 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <h1 className="text-3xl">Data scientists</h1>
-            <p className="text-sm">
-              Bridging the gap between human intent and machine understanding
-              through expert prompt design.
-            </p>
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <h1 className="text-xl font-medium">Image Title</h1>
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
           </div>
         </div>
-        <div className="relative group flex-grow transition-all w-56 h-[400px] duration-500 hover:w-full">
+        <div className="relative group rounded-lg overflow-hidden">
           <img
-            className="h-full w-full object-cover object-center"
-            src="https://plus.unsplash.com/premium_photo-1661306437817-8ab34be91e0c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZXZlbnRzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600"
+            src="../images/band3.jpeg"
             alt="image"
+            className="size-56 object-cover object-top"
           />
-          <div className="absolute inset-0 flex flex-col justify-end p-10 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <h1 className="text-3xl">Software engineers</h1>
-            <p className="text-sm">
-              Bridging the gap between human intent and machine understanding
-              through expert prompt design.
-            </p>
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div className="relative group rounded-lg overflow-hidden">
+          <img
+            src="../images/band4.jpeg"
+            alt="image"
+            className="size-56 object-cover object-top"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div className="relative group rounded-lg overflow-hidden">
+          <img
+            src="../images/band12.jpeg"
+            alt="image"
+            className="size-56 object-cover object-top"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div className="relative group rounded-lg overflow-hidden">
+          <img
+            src="../images/band7.jpeg"
+            alt="image"
+            className="size-56 object-cover object-top"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div className="relative group rounded-lg overflow-hidden">
+          <img
+            src="../images/band8.jpeg"
+            alt="image"
+            className="size-56 object-cover object-top"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div className="relative group rounded-lg overflow-hidden">
+          <img
+            src="../images/band9.jpeg"
+            alt="image"
+            className="size-56 object-cover object-top"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-4 text-white bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <h1 className="text-xl font-medium">Image Title</h1> */}
+            <a
+              href="#"
+              className="flex items-center gap-1 text-sm text-white/70"
+            >
+              Show More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 13 13"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.125 1.625H11.375V4.875"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M5.41602 7.58333L11.3743 1.625"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.75 7.04167V10.2917C9.75 10.579 9.63586 10.8545 9.4327 11.0577C9.22953 11.2609 8.95398 11.375 8.66667 11.375H2.70833C2.42102 11.375 2.14547 11.2609 1.9423 11.0577C1.73914 10.8545 1.625 10.579 1.625 10.2917V4.33333C1.625 4.04602 1.73914 3.77047 1.9423 3.5673C2.14547 3.36414 2.42102 3.25 2.70833 3.25H5.95833"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
