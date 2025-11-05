@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay"; // Import the plugin
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
   // Create the autoplay plugin instance (reused across carousels)
@@ -19,7 +20,7 @@ export default function Hero() {
       <section className="bg-gradient-to-b from-green-50 to-white py-8 md:py-12">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-6 px-4">
           {/* LEFT BANNER – Custom Tyvek */}
-          <div className="relative bg-red-100 rounded-xl overflow-hidden shadow-lg">
+          <div className="relative bg-red-100 animate animate-rotate-x animate-once rounded-xl overflow-hidden shadow-lg">
             <div className="p-6 md:p-10 flex flex-col justify-between h-full">
               <div>
                 <p className="text-xs md:text-sm text-gray-600 uppercase tracking-wider">
@@ -33,9 +34,12 @@ export default function Hero() {
                   <span className="text-green-700 font-semibold">$9.99</span>
                 </p>
               </div>
-              <button className="mt-6 w-fit bg-black hover:bg-red-500 text-white font-semibold py-2 px-6 rounded-md transition">
+              <Link
+                to="/products"
+                className="mt-6 w-fit bg-black hover:bg-red-500 text-white font-semibold py-2 px-6 rounded-md transition"
+              >
                 Shop Now
-              </button>
+              </Link>
             </div>
             <img
               src="/images/identityea5.png"
@@ -47,7 +51,7 @@ export default function Hero() {
           {/* RIGHT BANNERS – 40% & 20% */}
           <div className="grid grid-rows-2 gap-4">
             {/* 40% Off – Auto-playing mini carousel */}
-            <div className="bg-white rounded-xl p-6 flex items-center shadow-md">
+            <div className="bg-white rounded-xl animate-rotate-y animate-once p-6 flex items-center shadow-md">
               <div className="flex-1">
                 <p className="text-3xl md:text-4xl font-bold text-green-700">
                   40% Off
@@ -95,7 +99,7 @@ export default function Hero() {
             </div>
 
             {/* 20% Off */}
-            <div className="bg-black rounded-xl p-6 flex items-center shadow-md">
+            <div className="bg-black rounded-xl p-6 flex items-center shadow-md animate-fade-up animate-once">
               <div className="flex-1">
                 <p className="text-2xl md:text-3xl font-bold text-red-500">
                   20% Off

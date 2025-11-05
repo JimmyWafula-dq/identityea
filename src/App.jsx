@@ -12,12 +12,14 @@ import ForgotPage from "./pages/auth/ForgotPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductView from "./pages/ProductView";
 import CartPage from "./pages/CartPage";
+import ScrollToTop from "./layout/ScrollToTop";
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route index path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
