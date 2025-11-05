@@ -1,11 +1,15 @@
 import React from "react";
 import { Button } from "./ui/button";
 import Logo from "@/constants";
+import { useCart } from "@/context/CartContext";
+import { CartDrawer } from "./CartDrawer";
 
 const Navbar = () => {
+  const { itemCount } = useCart();
+  console.log("itemCount", itemCount);
   return (
     <div className="bg-black w-full sm:px-16 px-6 py-3 animate-fade-up animate-duration-[2000ms]">
-      <nav class="z-50 flex items-center justify-between w-full px-6 md:px-16 lg:px-24 xl:px-32 backdrop-blur text-white text-sm">
+      <nav class="z-50 flex items-center justify-between w-full px-6 md:px-6 backdrop-blur text-white text-sm">
         <a href="/">
           <Logo />
         </a>
@@ -28,10 +32,13 @@ const Navbar = () => {
         {/* <button class="hidden md:block px-6 py-2.5 text-black bg-white hover:bg-slate-200 active:scale-95 transition-all rounded-full">
           Contact us
         </button> */}
-        <div className="rainbow relative z-0 bg-white/15 overflow-hidden p-0.5 flex items-center justify-center rounded-full hover:scale-105 transition duration-300 active:scale-100">
-          <button className="px-8 text-sm py-3 text-white rounded-full font-medium bg-gray-900/80 backdrop-blur">
-            Shop Now
-          </button>
+        <div className="flex flex-row items-center space-x-5 relative">
+          <CartDrawer />
+          <div className="rainbow relative z-0 bg-white/15 overflow-hidden p-0.5 flex items-center justify-center rounded-full hover:scale-105 transition duration-300 active:scale-100">
+            <button className="px-8 text-sm py-3 text-white rounded-full font-medium bg-gray-900/80 backdrop-blur">
+              Shop Now
+            </button>
+          </div>
         </div>
         <button id="open-menu" class="md:hidden active:scale-90 transition">
           <svg

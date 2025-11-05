@@ -16,7 +16,11 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <a href="/">
               <h1 className="text-xl">
-                <Logo />
+                <img
+                  src="/images/identityea.png"
+                  className="w-16 h-14"
+                  alt=""
+                />
               </h1>
             </a>
             <p className="text-xs mt-6">

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
@@ -20,10 +21,14 @@
     "motion": "^12.23.24",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-helmet": "^6.1.0",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.4",
+    "recharts": "^3.3.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "tailwindcss-animated": "^2.0.0"
+    "tailwindcss-animated": "^2.0.0",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

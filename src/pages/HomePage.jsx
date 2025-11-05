@@ -8,6 +8,7 @@ import { Faq } from "@/components/Faq";
 import Promotional from "@/components/Promotional";
 import Testimonials from "@/components/Testimonials";
 import Products from "@/sections/Products";
+import { CartDrawer } from "@/components/CartDrawer";
 
 const HomePage = () => {
   return (

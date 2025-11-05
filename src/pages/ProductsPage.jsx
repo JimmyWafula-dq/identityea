@@ -6,7 +6,12 @@ import AppLayout from "@/layout/AppLayout";
 
 // Reusable Product Card Component
 const ProductCard = ({ product }) => (
-  <div className="group flex flex-col">
+  <Link
+    to={`/view/${product.name}`}
+    // send data to next page in state
+    state={{ product }}
+    className="group flex flex-col"
+  >
     <div className="bg-gray-50 rounded-2xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
       <img
         src={product.image}
@@ -39,7 +44,7 @@ const ProductCard = ({ product }) => (
         <span className="text-red-600 font-medium">{product.discount}</span>
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 export default function ProductsPage() {
@@ -202,7 +207,7 @@ export default function ProductsPage() {
     <>
       {/* Header */}
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-6 bg-neutral-50">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <aside
@@ -324,7 +329,7 @@ export default function ProductsPage() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1">
+            <main className="flex-1 p-5">
               {/* Top Bar */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <p className="text-sm text-gray-600">

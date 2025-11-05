@@ -104,9 +104,9 @@ export default function Products() {
       </div>
 
       <div className="w-full py-4 my-6 mx-auto text-center">
-        <Link to="/products" className="bg-black text-white px-6 py-2 rounded">
+        <a href="/products" className="bg-black text-white px-6 py-2 rounded">
           View All Products
-        </Link>
+        </a>
       </div>
     </section>
   );
