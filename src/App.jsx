@@ -1,7 +1,5 @@
+// src/App.jsx
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -13,6 +11,8 @@ import ProductsPage from "./pages/ProductsPage";
 import ProductView from "./pages/ProductView";
 import CartPage from "./pages/CartPage";
 import ScrollToTop from "./layout/ScrollToTop";
+import { ProfilePage } from "./pages/ProfilePage";
+import { ProtectedRoute } from "./pages/auth/ProtectedRoute";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -21,7 +21,8 @@ function App() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route index path="/" element={<HomePage />} />
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/auth/login" element={<LoginPage />} />
@@ -30,6 +31,16 @@ function App() {
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/view/:name" element={<ProductView />} />
         <Route path="/cart" element={<CartPage />} />
+
+        {/* Protected Route: Profile */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

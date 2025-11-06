@@ -20,7 +20,7 @@ import { useCart } from "@/context/CartContext";
 export function CartDrawer() {
   const { itemCount } = useCart();
   return (
-    <Drawer>
+    <Drawer className="">
       <DrawerTrigger asChild>
         <button className="relative cursor-pointer">
           <svg
