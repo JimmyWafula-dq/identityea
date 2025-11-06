@@ -3,10 +3,13 @@ import { Button } from "./ui/button";
 import Logo from "@/constants";
 import { useCart } from "@/context/CartContext";
 import { CartDrawer } from "./CartDrawer";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const { itemCount } = useCart();
   console.log("itemCount", itemCount);
+
+  const { user, logout } = useAuth();
   return (
     <div className="bg-black w-full sm:px-16 py-3 animate-fade-up animate-duration-[2000ms]">
       <nav class="z-50 flex items-center justify-between w-full px-6 md:px-6 backdrop-blur text-white text-sm">
@@ -34,14 +37,18 @@ const Navbar = () => {
         </button> */}
         <div className="flex flex-row items-center space-x-5 relative">
           <CartDrawer />
-          <a
-            href="/auth/login"
-            className="rainbow relative z-0 bg-white/15 overflow-hidden p-0.5 flex items-center justify-center rounded-full hover:scale-105 transition duration-300 active:scale-100"
-          >
-            <button className="px-8 text-sm py-3 text-white rounded-full font-medium bg-gray-900/80 backdrop-blur">
-              Shop Now
-            </button>
-          </a>
+          {user ? (
+            <button onClick={logout}>Logout</button>
+          ) : (
+            <a
+              href="/auth/login"
+              className="rainbow relative z-0 bg-white/15 overflow-hidden p-0.5 flex items-center justify-center rounded-full hover:scale-105 transition duration-300 active:scale-100"
+            >
+              <button className="px-8 text-sm py-3 text-white rounded-full font-medium bg-gray-900/80 backdrop-blur">
+                Shop Now
+              </button>
+            </a>
+          )}
         </div>
         <button id="open-menu" class="md:hidden active:scale-90 transition">
           <svg

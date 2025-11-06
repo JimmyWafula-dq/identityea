@@ -67,7 +67,7 @@ export function CartDrawer() {
         {/* Fixed Footer */}
         <DrawerFooter className="border-t bg-white pt-4">
           <Button className="w-full" size="lg">
-            Proceed to Checkout
+            Get Quote
           </Button>
           <DrawerClose asChild>
             <Button variant="outline" className="w-full mt-2">

@@ -82,7 +82,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const subtotal = state.items.reduce(
-    (sum, item) => sum + item.salePrice * item.quantity,
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
   const shipping = subtotal > 200 ? 0 : 15;

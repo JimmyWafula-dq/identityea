@@ -1,5 +1,5 @@
 // src/pages/ProductDetail.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Star,
   Heart,
@@ -9,35 +9,63 @@ import {
   Check,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useCart } from "@/context/CartContext"; // <-- NEW
+import { useCart } from "@/context/CartContext";
 import AppLayout from "@/layout/AppLayout";
-import toast from "react-hot-toast"; // <-- optional toast
+import toast from "react-hot-toast";
+import api, { baseUrl } from "@/lib/api";
 
-// Reusable Related-Product Card (unchanged)
+// Related Product Card (your updated version – no ratings)
 const RelatedProductCard = ({ product }) => (
-  <div className="group flex flex-col">
-    <div className="bg-gray-50 rounded-2xl p-4 mb-3 w-full h-40 flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+  <Link
+    to={`/view/${encodeURIComponent(product.name)}`}
+    state={{ product }}
+    key={product._id}
+    className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out max-w-xs w-full"
+  >
+    {/* Image Container */}
+    <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
       <img
-        src={product.image}
+        src={`${baseUrl}/${product.image}`}
         alt={product.name}
-        className="max-h-full max-w-full object-contain"
+        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
       />
+      {/* Overlay for hover effect */}
+      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
     </div>
-    <h3 className="text-sm font-medium text-gray-900">{product.name}</h3>
-    <div className="flex items-center gap-1 mt-1">
-      {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          className={`w-3 h-3 ${
-            i < product.rating
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-gray-300"
-          }`}
-        />
-      ))}
+
+    {/* Product Info */}
+    <div className="space-y-3 w-full">
+      {/* Name + Wishlist */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900 truncate">
+          {product.name}
+        </h3>
+        <button
+          className="text-gray-400 hover:text-red-500 transition-colors duration-200"
+          aria-label="Add to wishlist"
+        >
+          <Heart className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Price & Discount */}
+      <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
+        <span className="text-xl font-bold text-gray-900">
+          ${product.price}
+        </span>
+        {product.discount > 0 && (
+          <span className="text-gray-500 line-through">
+            ${(product.price + product.discount).toFixed(2)}
+          </span>
+        )}
+        {product.discount > 0 && (
+          <span className="text-red-600 font-medium">
+            {product.discount}% off
+          </span>
+        )}
+      </div>
     </div>
-    <p className="text-lg font-bold text-gray-900 mt-1">${product.salePrice}</p>
-  </div>
+  </Link>
 );
 
 export default function ProductView() {
@@ -48,18 +76,52 @@ export default function ProductView() {
   const [quantity, setQuantity] = useState(1);
 
   // ---------- Product from navigation ----------
-  const { product } = useLocation().state;
-  // console.log("prod", product);
+  const location = useLocation();
+  const { product: currentProduct } = location.state || {};
+  const [product, setProduct] = useState(currentProduct || null);
 
   // ---------- Cart ----------
-  const { addToCart } = useCart(); // <-- NEW
+  const { addToCart } = useCart();
+
+  // ---------- Related Products (fetch all, exclude current) ----------
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+
+  const getProducts = async () => {
+    setLoadingRelated(true);
+    try {
+      const res = await api.get("/products");
+      const all = res.data.map((p) => ({
+        ...p,
+        price: Number(p.price),
+        discount: Number(p.discount) || 0,
+      }));
+      // Exclude current product
+      const filtered = all.filter((p) => p._id !== currentProduct?._id);
+      // Shuffle and limit to 4
+      const shuffled = filtered.sort(() => 0.5 - Math.random()).slice(0, 4);
+      setRelatedProducts(shuffled);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingRelated(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentProduct) {
+      getProducts();
+    }
+  }, [currentProduct]);
 
   // ---------- Add-to-Cart Handler ----------
   const handleAddToCart = () => {
+    if (!product) return;
+
     const cartItem = {
-      id: `${product.id}-${selectedColor}-${selectedSize}`, // unique per variant
+      id: `${product._id}-${selectedColor}-${selectedSize}`, // unique per variant
       name: product.name,
-      salePrice: product.salePrice,
+      price: product.price,
       image: product.image,
       color: selectedColor,
       size: selectedSize,
@@ -79,40 +141,22 @@ export default function ProductView() {
     );
   };
 
-  // ---------- Static data (you can replace with real data) ----------
+  // ---------- Static data ----------
   const colors = ["Green", "Black", "White", "Gray"];
   const sizes = [40, 41, 42, 43, 44, 45, 46, 47];
 
-  const relatedProducts = [
-    {
-      id: 1,
-      name: "PulseSneaks Pro",
-      rating: 5,
-      salePrice: 140,
-      image: "/images/related-1.webp",
-    },
-    {
-      id: 2,
-      name: "AirPulse V2",
-      rating: 4,
-      salePrice: 120,
-      image: "/images/related-2.webp",
-    },
-    {
-      id: 3,
-      name: "FlexRun Lite",
-      rating: 5,
-      salePrice: 110,
-      image: "/images/related-3.webp",
-    },
-    {
-      id: 4,
-      name: "SpeedPulse X",
-      rating: 5,
-      salePrice: 155,
-      image: "/images/related-4.webp",
-    },
-  ];
+  if (!product) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+          <p className="text-xl text-gray-600">Product not found</p>
+          <Link to="/products" className="mt-4 text-sm text-black underline">
+            Back to Products
+          </Link>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -126,56 +170,69 @@ export default function ProductView() {
           <Link to="/products" className="hover:text-black">
             Products
           </Link>{" "}
-          &gt; <span className="text-black">{product?.name}</span>
+          &gt; <span className="text-black">{product.name}</span>
         </nav>
       </div>
 
       {/* Main Product Section */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Image Gallery (kept minimal – you can expand) */}
-          <div className="space-y-4">
-            <div className="bg-gradient-to-br from-lime-50 to-white rounded-2xl p-8 shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          {/* Image Gallery */}
+          <div className="space-y-4 relative group">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 lg:p-12 flex items-center justify-center overflow-hidden shadow-inner">
               <img
-                src={product.image}
+                src={`${baseUrl}/${product.image}`}
                 alt={product.name}
-                className="w-full h-auto object-contain max-h-96 mx-auto"
+                className="max-h-96 lg:max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </div>
+            <div className="absolute inset-0 rounded-3xl ring-1 ring-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6">
-            {/* Title & Rating */}
+          <div className="flex flex-col justify-center space-y-7">
+            {/* Title & Rating (fallback if no rating) */}
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
-              <div className="flex items-center gap-2 mt-2">
-                {[...Array(product.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5 fill-yellow-400 text-yellow-400"
+              {product.color && (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-sm text-gray-600">Color:</span>
+                  <div
+                    className="w-6 h-6 rounded-full border-2 border-gray-300"
+                    style={{ backgroundColor: product.color.toLowerCase() }}
                   />
-                ))}
-                <span className="text-sm text-gray-600">
-                  (234 Total Reviews)
-                </span>
-              </div>
+                  <span className="text-sm font-medium text-gray-800">
+                    {product.color}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Price */}
-            <div className="text-3xl font-bold text-gray-900">
-              ${product.salePrice}
+            <div className="flex items-baseline gap-3">
+              <span className="text-4xl font-bold text-gray-900">
+                ${product.price}
+              </span>
+              {product.discount > 0 && (
+                <>
+                  <span className="text-xl text-gray-400 line-through">
+                    ${(product.price + product.discount).toFixed(2)}
+                  </span>
+                  <span className="bg-red-100 text-red-700 text-sm font-semibold px-3 py-1 rounded-full">
+                    {product.discount}% OFF
+                  </span>
+                </>
+              )}
             </div>
 
-            {/* Description (you can pull from product.description) */}
-            <p className="text-gray-600 leading-relaxed">
-              Step into style and comfort with the PulseSneaks Relax 4. These
-              sneakers feature a breathable mesh upper for comfort during long
-              wear, a cushioned insole for support, and a durable rubber outsole
-              for traction. Perfect for casual outings or light workouts.
-            </p>
+            {/* Description */}
+            {product.description && (
+              <p className="text-gray-600 leading-relaxed text-base lg:text-lg">
+                {product.description}
+              </p>
+            )}
 
             <hr className="border-gray-200" />
 
@@ -189,10 +246,10 @@ export default function ProductView() {
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
-                    className={`w-10 h-10 rounded-full border-2 transition-all ${
+                    className={`w-10 h-10 rounded-full border-2 transition-all duration-200 ${
                       selectedColor === color
                         ? "border-black ring-2 ring-offset-2 ring-black"
-                        : "border-gray-300"
+                        : "border-gray-300 hover:border-gray-400"
                     }`}
                     style={{
                       backgroundColor:
@@ -211,13 +268,15 @@ export default function ProductView() {
 
             {/* Size Selection */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Size</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">
+                Size: <span className="font-normal">{selectedSize}</span>
+              </h3>
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                 {sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`py-2 text-sm font-medium rounded-lg border transition-all ${
+                    className={`py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
                       selectedSize === size
                         ? "bg-black text-white border-black"
                         : "bg-white text-gray-700 border-gray-300 hover:border-black"
@@ -231,41 +290,63 @@ export default function ProductView() {
 
             {/* Quantity & Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex items-center border border-gray-300 rounded-lg w-fit">
+              <div className="flex items-center border border-gray-300 rounded-xl w-fit">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-3 hover:bg-gray-100"
+                  className="p-3 hover:bg-gray-50 transition"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="px-6 font-medium">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 hover:bg-gray-100"
+                  className="p-3 hover:bg-gray-50 transition"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* ---------- ADD TO CART ---------- */}
+              {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition flex items-center justify-center gap-2"
+                className="flex-1 bg-black text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all duration-200 transform active:scale-95"
               >
                 <ShoppingCart className="w-5 h-5" />
                 Add To Cart
               </button>
 
-              <button className="px-6 py-3 border border-gray-300 rounded-lg hover:border-black transition">
-                <Heart className="w-5 h-5 text-gray-600" />
+              <button className="px-4 py-4 border border-gray-300 rounded-xl hover:border-black hover:bg-gray-50 transition-all duration-200 group">
+                <Heart className="w-5 h-5 text-gray-600 group-hover:text-red-500 group-hover:fill-red-500 transition-all" />
               </button>
             </div>
 
-            <button className="w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-black transition">
+            <button className="w-full bg-gray-900 text-white py-4 rounded-xl font-semibold hover:bg-black transition-all duration-200">
               Buy Now
             </button>
 
-            <p className="text-xs text-gray-500">
+            {/* Trust Badges */}
+            <div className="flex items-center gap-6 text-sm text-gray-500 pt-6 border-t border-gray-100">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                  <Check className="w-3 h-3 text-green-600" />
+                </div>
+                <span>Secure Checkout</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-3 h-3 text-blue-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M8 16.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM14 16.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v1H3V4zm0 3h14v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
+                  </svg>
+                </div>
+                <span>Free Returns</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-4">
               Free Delivery On Orders Over $200
             </p>
           </div>
@@ -273,15 +354,38 @@ export default function ProductView() {
       </section>
 
       {/* Related Products */}
-      <section className="max-w-7xl mx-auto px-4 py-12 border-t">
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
-          Related Products
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {relatedProducts.map((product) => (
-            <RelatedProductCard key={product.id} product={product} />
-          ))}
+      <section className="max-w-7xl mx-auto px-4 py-12 border-t bg-gray-50">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+            You Might Also Like
+          </h2>
+          <Link
+            to="/products"
+            className="text-sm font-medium text-black hover:underline"
+          >
+            View All
+          </Link>
         </div>
+        {loadingRelated ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
+                <div className="bg-gray-200 rounded-xl h-48 mb-4"></div>
+                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {relatedProducts.map((relatedProduct) => (
+              <RelatedProductCard
+                key={relatedProduct._id}
+                product={relatedProduct}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </AppLayout>
   );

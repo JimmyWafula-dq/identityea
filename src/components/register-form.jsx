@@ -2,10 +2,55 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "@/lib/api";
+import { CheckCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 export function RegisterForm({ className, ...props }) {
+  const [email, setEmail] = useState("ghostbmer@gmail.com");
+  const [password, setPassword] = useState("password");
+  const [username, setUsername] = useState("Jey");
+  const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("password");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await api.post("/auth/register", {
+        email,
+        password,
+        name: username,
+      });
+      // if (res.data.token) {
+      //   localStorage.setItem("token", res.data.token);
+      // }
+      console.log("res", res.data);
+      toast.success("Account Created Successfully");
+      navigate("/auth/login");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Login failed", {
+        duration: 4000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      onSubmit={handleSubmit}
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+    >
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Register to your account</h1>
         <p className="text-balance text-sm text-muted-foreground">
@@ -15,11 +60,25 @@ export function RegisterForm({ className, ...props }) {
       <div className="grid gap-6">
         <div className="grid gap-2">
           <Label htmlFor="username">Username</Label>
-          <Input id="username" type="text" placeholder="username" required />
+          <Input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            id="username"
+            type="text"
+            placeholder="username"
+            required
+          />
         </div>
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+            required
+          />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
@@ -31,10 +90,39 @@ export function RegisterForm({ className, ...props }) {
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" required />
+          <Input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            id="password"
+            type="password"
+            required
+          />
         </div>
-        <Button type="submit" className="w-full">
-          Login
+        <div className="grid gap-2">
+          <div className="flex items-center">
+            <Label htmlFor="password">Confirm Password</Label>
+          </div>
+          <Input
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            id="password"
+            type="password"
+            required
+          />
+          <div className="w-full flex space-x-4 py-3 flex-row items-center">
+            <CheckCircle
+              size={15}
+              className={
+                password === confirmPassword
+                  ? "text-green-500"
+                  : "text-gray-500"
+              }
+            />
+            <p className="text-xs text-neutral-400">Password match.</p>
+          </div>
+        </div>
+        <Button disabled={loading} type="submit" className="w-full">
+          {loading ? "Creating Account..." : "Create Account"}
         </Button>
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-muted-foreground">

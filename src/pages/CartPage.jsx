@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import AppLayout from "@/layout/AppLayout";
+import { baseUrl } from "@/lib/api";
 
 export default function CartPage() {
   const { cart, updateQuantity, removeItem, subtotal, shipping, total } =
@@ -42,7 +43,7 @@ export default function CartPage() {
                   className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 border"
                 >
                   <img
-                    src={item.image}
+                    src={`${baseUrl}/${item.image}`}
                     alt={item.name}
                     className="w-20 h-20 object-contain rounded-lg"
                   />
@@ -53,7 +54,7 @@ export default function CartPage() {
                       Size: {item.size} | Color: {item.color}
                     </p>
                     <p className="text-lg font-bold text-gray-900 mt-1">
-                      ${item.salePrice}
+                      ${item.price}
                     </p>
                   </div>
 
@@ -118,7 +119,7 @@ export default function CartPage() {
                 </div>
 
                 <button className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition">
-                  Proceed to Checkout
+                  Get Quote
                 </button>
 
                 <Link
