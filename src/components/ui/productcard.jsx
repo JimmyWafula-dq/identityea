@@ -9,7 +9,7 @@ const ProductCard = ({ product }) => {
       to={`/view/${encodeURIComponent(product.name)}`}
       state={{ product }} // still works for internal navigation
       key={product._id}
-      className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out max-w-xs w-full"
+      className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out  w-full"
     >
       {/* Image Container */}
       <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">

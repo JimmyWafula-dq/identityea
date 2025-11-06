@@ -1,41 +1,35 @@
 // src/pages/ProductDetail.jsx
 import React, { useEffect, useState } from "react";
 import {
-  Star,
   Heart,
   ShoppingCart,
   ChevronLeft,
   ChevronRight,
   Check,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import AppLayout from "@/layout/AppLayout";
 import toast from "react-hot-toast";
 import api, { baseUrl } from "@/lib/api";
 
-// Related Product Card (your updated version – no ratings)
+// Related Product Card
 const RelatedProductCard = ({ product }) => (
   <Link
     to={`/view/${encodeURIComponent(product.name)}`}
-    state={{ product }}
     key={product._id}
-    className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out max-w-xs w-full"
+    className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out w-full"
   >
-    {/* Image Container */}
     <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
       <img
         src={`${baseUrl}/${product.image}`}
         alt={product.name}
         className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
       />
-      {/* Overlay for hover effect */}
       <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
     </div>
 
-    {/* Product Info */}
     <div className="space-y-3 w-full">
-      {/* Name + Wishlist */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-900 truncate">
           {product.name}
@@ -48,7 +42,6 @@ const RelatedProductCard = ({ product }) => (
         </button>
       </div>
 
-      {/* Price & Discount */}
       <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
         <span className="text-xl font-bold text-gray-900">
           ${product.price}
@@ -69,25 +62,57 @@ const RelatedProductCard = ({ product }) => (
 );
 
 export default function ProductView() {
-  // ---------- UI State ----------
-  const [selectedImage] = useState(0);
+  // ---------- URL & Navigation ----------
+  const { name } = useParams(); // from /view/:name
+  const location = useLocation();
+  const { product: stateProduct } = location.state || {};
+
+  // ---------- State ----------
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+
   const [selectedColor, setSelectedColor] = useState("Green");
   const [selectedSize, setSelectedSize] = useState(42);
   const [quantity, setQuantity] = useState(1);
 
-  // ---------- Product from navigation ----------
-  const location = useLocation();
-  const { product: currentProduct } = location.state || {};
-  const [product, setProduct] = useState(currentProduct || null);
-
   // ---------- Cart ----------
   const { addToCart } = useCart();
 
-  // ---------- Related Products (fetch all, exclude current) ----------
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loadingRelated, setLoadingRelated] = useState(false);
+  // ---------- Fetch Product by Name ----------
+  const fetchProductByName = async (productName) => {
+    setLoading(true);
+    try {
+      const res = await api.get("/products");
+      const all = res.data.map((p) => ({
+        ...p,
+        price: Number(p.price),
+        discount: Number(p.discount) || 0,
+      }));
 
-  const getProducts = async () => {
+      const decodedName = decodeURIComponent(productName);
+      const found = all.find(
+        (p) => p.name.toLowerCase() === decodedName.toLowerCase()
+      );
+
+      if (found) {
+        setProduct(found);
+        // Pre-fill color if available
+        if (found.color) setSelectedColor(found.color);
+      } else {
+        setProduct(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch product:", error);
+      setProduct(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ---------- Fetch Related Products ----------
+  const fetchRelatedProducts = async (currentId) => {
     setLoadingRelated(true);
     try {
       const res = await api.get("/products");
@@ -96,30 +121,40 @@ export default function ProductView() {
         price: Number(p.price),
         discount: Number(p.discount) || 0,
       }));
-      // Exclude current product
-      const filtered = all.filter((p) => p._id !== currentProduct?._id);
-      // Shuffle and limit to 4
-      const shuffled = filtered.sort(() => 0.5 - Math.random()).slice(0, 4);
-      setRelatedProducts(shuffled);
+
+      const filtered = all
+        .filter((p) => p._id !== currentId)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 4);
+
+      setRelatedProducts(filtered);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch related:", error);
     } finally {
       setLoadingRelated(false);
     }
   };
 
+  // ---------- Effect: Load Product ----------
   useEffect(() => {
-    if (currentProduct) {
-      getProducts();
+    if (name) {
+      fetchProductByName(name);
     }
-  }, [currentProduct]);
+  }, [name]);
 
-  // ---------- Add-to-Cart Handler ----------
+  // ---------- Effect: Load Related (after product) ----------
+  useEffect(() => {
+    if (product?._id) {
+      fetchRelatedProducts(product._id);
+    }
+  }, [product]);
+
+  // ---------- Add to Cart ----------
   const handleAddToCart = () => {
     if (!product) return;
 
     const cartItem = {
-      id: `${product._id}-${selectedColor}-${selectedSize}`, // unique per variant
+      id: `${product._id}-${selectedColor}-${selectedSize}`,
       name: product.name,
       price: product.price,
       image: product.image,
@@ -133,23 +168,47 @@ export default function ProductView() {
       <div className="flex items-center gap-2">
         <Check className="w-5 h-5 text-green-600" />
         <span>
-          {quantity} × {product.name} ({selectedColor}, {selectedSize}) added to
-          cart
+          {quantity} × {product.name} ({selectedColor}, {selectedSize}) added
         </span>
       </div>,
       { duration: 2500 }
     );
   };
 
-  // ---------- Static data ----------
+  // ---------- Static Options ----------
   const colors = ["Green", "Black", "White", "Gray"];
   const sizes = [40, 41, 42, 43, 44, 45, 46, 47];
+
+  // ---------- Loading / Error ----------
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
+            <div className="grid md:grid-cols-2 gap-10">
+              <div className="bg-gray-100 rounded-3xl h-96"></div>
+              <div className="space-y-6">
+                <div className="h-10 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                </div>
+                <div className="h-14 bg-gray-200 rounded-xl w-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (!product) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-          <p className="text-xl text-gray-600">Product not found</p>
+          <p className="text-xl text-red-600">Product not found</p>
           <Link to="/products" className="mt-4 text-sm text-black underline">
             Back to Products
           </Link>
@@ -174,11 +233,11 @@ export default function ProductView() {
         </nav>
       </div>
 
-      {/* Main Product Section */}
+      {/* Main Section */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          {/* Image Gallery */}
-          <div className="space-y-4 relative group">
+          {/* Image */}
+          <div className="relative group">
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 lg:p-12 flex items-center justify-center overflow-hidden shadow-inner">
               <img
                 src={`${baseUrl}/${product.image}`}
@@ -189,9 +248,8 @@ export default function ProductView() {
             <div className="absolute inset-0 rounded-3xl ring-1 ring-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
           </div>
 
-          {/* Product Info */}
+          {/* Info */}
           <div className="flex flex-col justify-center space-y-7">
-            {/* Title & Rating (fallback if no rating) */}
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                 {product.name}
@@ -210,7 +268,6 @@ export default function ProductView() {
               )}
             </div>
 
-            {/* Price */}
             <div className="flex items-baseline gap-3">
               <span className="text-4xl font-bold text-gray-900">
                 ${product.price}
@@ -227,7 +284,6 @@ export default function ProductView() {
               )}
             </div>
 
-            {/* Description */}
             {product.description && (
               <p className="text-gray-600 leading-relaxed text-base lg:text-lg">
                 {product.description}
@@ -236,7 +292,7 @@ export default function ProductView() {
 
             <hr className="border-gray-200" />
 
-            {/* Color Selection */}
+            {/* Color */}
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">
                 Color: <span className="font-normal">{selectedColor}</span>
@@ -266,8 +322,8 @@ export default function ProductView() {
               </div>
             </div>
 
-            {/* Size Selection */}
-            <div>
+            {/* Size */}
+            {/* <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">
                 Size: <span className="font-normal">{selectedSize}</span>
               </h3>
@@ -286,9 +342,9 @@ export default function ProductView() {
                   </button>
                 ))}
               </div>
-            </div>
+            </div> */}
 
-            {/* Quantity & Actions */}
+            {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex items-center border border-gray-300 rounded-xl w-fit">
                 <button
@@ -306,7 +362,6 @@ export default function ProductView() {
                 </button>
               </div>
 
-              {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
                 className="flex-1 bg-black text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all duration-200 transform active:scale-95"
@@ -315,16 +370,16 @@ export default function ProductView() {
                 Add To Cart
               </button>
 
-              <button className="px-4 py-4 border border-gray-300 rounded-xl hover:border-black hover:bg-gray-50 transition-all duration-200 group">
+              {/* <button className="px-4 py-4 border border-gray-300 rounded-xl hover:border-black hover:bg-gray-50 transition-all duration-200 group">
                 <Heart className="w-5 h-5 text-gray-600 group-hover:text-red-500 group-hover:fill-red-500 transition-all" />
-              </button>
+              </button> */}
             </div>
 
             <button className="w-full bg-gray-900 text-white py-4 rounded-xl font-semibold hover:bg-black transition-all duration-200">
-              Buy Now
+              Get A quote
             </button>
 
-            {/* Trust Badges */}
+            {/* Trust */}
             <div className="flex items-center gap-6 text-sm text-gray-500 pt-6 border-t border-gray-100">
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
@@ -353,7 +408,7 @@ export default function ProductView() {
         </div>
       </section>
 
-      {/* Related Products */}
+      {/* Related */}
       <section className="max-w-7xl mx-auto px-4 py-12 border-t bg-gray-50">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
@@ -377,12 +432,9 @@ export default function ProductView() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedProducts.map((relatedProduct) => (
-              <RelatedProductCard
-                key={relatedProduct._id}
-                product={relatedProduct}
-              />
+          <div className="grid grid-cols-1 w-full mx-auto md:grid-cols-4 gap-6">
+            {relatedProducts.map((p) => (
+              <RelatedProductCard key={p._id} product={p} />
             ))}
           </div>
         )}
