@@ -11,7 +11,7 @@ export default function CartPage() {
     useCart();
 
   return (
-    <>
+    <div className="bg-white">
       {cart?.length === 0 ? (
         <div className="max-w-7xl mx-auto px-4 py-16 text-center">
           <ShoppingBag className="w-16 h-16 mx-auto text-gray-300 mb-4" />
@@ -133,6 +133,6 @@ export default function CartPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

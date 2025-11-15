@@ -13,6 +13,8 @@ import CartPage from "./pages/CartPage";
 import ScrollToTop from "./layout/ScrollToTop";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ProtectedRoute } from "./pages/auth/ProtectedRoute";
+import CategoriesPage from "./pages/CategoriesPage";
+import QuoteCartPage from "./pages/QuoteCartPage";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -29,8 +31,10 @@ function App() {
         <Route path="/auth/register" element={<RegisterPage />} />
         <Route path="/auth/forgot" element={<ForgotPage />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/view/:name" element={<ProductView />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/quote-cart" element={<QuoteCartPage />} />
 
         {/* Protected Route: Profile */}
         <Route

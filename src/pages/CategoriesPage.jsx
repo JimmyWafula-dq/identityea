@@ -1,17 +1,18 @@
+// src/pages/AllProducts.jsx
 import React, { useState, useMemo, useEffect } from "react";
-import { Search, Filter, X, ChevronDown } from "lucide-react";
-import { useSearchParams } from "react-router-dom"; // ← ADDED
+import { Heart, Search, Filter, ChevronDown, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import AppLayout from "@/layout/AppLayout";
 import ProductCard from "@/components/ui/productcard";
 import api from "@/lib/api";
 
-export default function ProductsPage() {
-  const [searchParams, setSearchParams] = useSearchParams(); // ← ADDED
-
+export default function CategoriesPage() {
+  // Filter States
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedColor, setSelectedColor] = useState("All");
-  const [quantityTier, setQuantityTier] = useState("2-9");
+  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [sortBy, setSortBy] = useState("featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [allProducts, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,25 +22,11 @@ export default function ProductsPage() {
     setLoading(true);
     try {
       const res = await api.get("/products");
+      // Normalize data: ensure price is number
       const normalized = res.data.map((p) => ({
         ...p,
         price: Number(p.price),
         discount: Number(p.discount) || 0,
-        // Extract pricing tiers
-        pricing: {
-          "2-9": p.category.twotonine ? Number(p.category.twotonine) : null,
-          "10-19": p.category.onetonineteen
-            ? Number(p.category.onetonineteen)
-            : null,
-          "20-99": p.category.twothousandtonine
-            ? Number(p.category.twothousandtonine)
-            : null,
-          "100-200": p.category.tenthousandtotwenty
-            ? Number(p.category.tenthousandtotwenty)
-            : null,
-          printed: p.category.printed ? Number(p.category.printed) : null,
-          fixed: p.category.fixed ? Number(p.category.fixed) : null,
-        },
       }));
       setProducts(normalized);
     } catch (error) {
@@ -53,68 +40,59 @@ export default function ProductsPage() {
     getProducts();
   }, []);
 
-  // Extract unique types and colors
-  const types = useMemo(() => {
-    const unique = [
-      ...new Set(allProducts.map((p) => p.category.name).filter(Boolean)),
+  // Extract unique categories and colors
+  const categories = useMemo(() => {
+    const cats = [
+      ...new Set(allProducts.map((p) => p.category).filter(Boolean)),
     ];
-    return ["All", ...unique.sort()];
+    return ["All", ...cats.sort()];
   }, [allProducts]);
 
   const colors = useMemo(() => {
-    const unique = [
-      ...new Set(allProducts.map((p) => p.color).filter(Boolean)),
-    ];
-    return ["All", ...unique.sort()];
+    const cols = [...new Set(allProducts.map((p) => p.color).filter(Boolean))];
+    return ["All", ...cols.sort()];
   }, [allProducts]);
 
-  const quantityTiers = [
-    { value: "2-9", label: "2–9 units" },
-    { value: "10-19", label: "10–19 units" },
-    { value: "20-99", label: "20–99 units" },
-    { value: "100-200", label: "100–200 units" },
-  ];
-
-  // ──────────────────────────────────────────────────────────────
-  // Sync URL ?category=... with selectedType
-  // ──────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const urlCategory = searchParams.get("category");
-    if (urlCategory && types.includes(urlCategory)) {
-      setSelectedType(urlCategory);
-    } else if (!urlCategory) {
-      setSelectedType("All");
-    }
-  }, [searchParams, types]);
-
-  // Filter & Price Logic
+  // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
-    return allProducts
-      .filter((product) => {
-        const matchesSearch = product.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const matchesType =
-          selectedType === "All" || product.category.name === selectedType;
-        const matchesColor =
-          selectedColor === "All" || product.color === selectedColor;
+    return allProducts.filter((product) => {
+      const matchesSearch = product.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "All" || product.category === selectedCategory;
+      const matchesColor =
+        selectedColor === "All" || product.color === selectedColor;
+      const matchesPrice =
+        product.price >= priceRange[0] && product.price <= priceRange[1];
 
-        return matchesSearch && matchesType && matchesColor;
-      })
-      .map((product) => {
-        const tierPrice = product.pricing[quantityTier];
-        const basePrice = product.pricing.fixed || tierPrice || product.price;
-        return { ...product, displayPrice: basePrice };
-      });
-  }, [allProducts, searchTerm, selectedType, selectedColor, quantityTier]);
+      return matchesSearch && matchesCategory && matchesColor && matchesPrice;
+    });
+  }, [allProducts, searchTerm, selectedCategory, selectedColor, priceRange]);
+
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts];
+    switch (sortBy) {
+      case "price-low":
+        return sorted.sort((a, b) => a.price - b.price);
+      case "price-high":
+        return sorted.sort((a, b) => b.price - a.price);
+      case "discount":
+        return sorted.sort((a, b) => b.discount - a.discount);
+      case "name":
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      default:
+        return sorted;
+    }
+  }, [filteredProducts, sortBy]);
 
   // Reset Filters
   const resetFilters = () => {
     setSearchTerm("");
-    setSelectedType("All");
+    setSelectedCategory("All");
     setSelectedColor("All");
-    setQuantityTier("2-9");
-    setSearchParams({}); // Clear URL
+    setPriceRange([0, 500]);
+    setSortBy("featured");
   };
 
   return (
@@ -123,13 +101,14 @@ export default function ProductsPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filter Sidebar */}
           <aside
-            className={`fixed inset-0 z-50 lg:relative lg:z-auto bg-white lg:bg-transparent p-6 lg:p-0 transition-transform duration-300 ${
+            className={`fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto bg-white lg:bg-transparent p-6 lg:p-0 transition-transform duration-300 ${
               mobileFiltersOpen
                 ? "translate-x-0"
                 : "-translate-x-full lg:translate-x-0"
             } lg:block`}
           >
             <div className="lg:sticky lg:top-6 bg-white rounded-2xl shadow-lg p-6 lg:p-8 h-fit">
+              {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   <Filter className="w-5 h-5" />
@@ -146,49 +125,42 @@ export default function ProductsPage() {
               {/* Search */}
               <div className="mb-6">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search wristbands..."
+                    placeholder="Search products..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
                   />
                 </div>
               </div>
 
-              {/* Product Type – URL Sync Added */}
+              {/* Categories */}
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Type</h4>
+                <h4 className="font-semibold text-gray-900 mb-3">Category</h4>
                 <div className="space-y-2">
-                  {types.map((type) => (
+                  {categories.map((cat) => (
                     <label
-                      key={type}
+                      key={cat}
                       className="flex items-center gap-3 cursor-pointer group"
                     >
                       <input
                         type="radio"
-                        name="type"
-                        checked={selectedType === type}
-                        onChange={() => {
-                          setSelectedType(type);
-                          if (type === "All") {
-                            setSearchParams({});
-                          } else {
-                            setSearchParams({ category: type });
-                          }
-                        }}
+                        name="category"
+                        checked={selectedCategory === cat}
+                        onChange={() => setSelectedCategory(cat)}
                         className="w-4 h-4 text-black focus:ring-black"
                       />
                       <span className="text-sm text-gray-700 group-hover:text-black transition">
-                        {type}
+                        {cat}
                       </span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* Color */}
+              {/* Colors */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Color</h4>
                 <div className="flex flex-wrap gap-3">
@@ -215,28 +187,28 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              {/* Quantity Tier */}
+              {/* Price Range */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">
-                  Quantity Tier
+                  Price Range
                 </h4>
-                <select
-                  value={quantityTier}
-                  onChange={(e) => setQuantityTier(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                >
-                  {quantityTiers.map((tier) => (
-                    <option key={tier.value} value={tier.value}>
-                      {tier.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-2">
-                  Price per unit updates based on quantity
-                </p>
+                <input
+                  type="range"
+                  min="0"
+                  max="500"
+                  value={priceRange[1]}
+                  onChange={(e) =>
+                    setPriceRange([priceRange[0], Number(e.target.value)])
+                  }
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                />
+                <div className="flex justify-between mt-2 text-sm text-gray-600">
+                  <span>${priceRange[0]}</span>
+                  <span>${priceRange[1]}</span>
+                </div>
               </div>
 
-              {/* Reset */}
+              {/* Reset Button */}
               <button
                 onClick={resetFilters}
                 className="w-full py-2.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 transition"
@@ -251,13 +223,14 @@ export default function ProductsPage() {
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Event Wristbands
-                </h1>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600">
                   Showing{" "}
                   <strong className="text-gray-900">
-                    {filteredProducts.length}
+                    {sortedProducts.length}
+                  </strong>{" "}
+                  of{" "}
+                  <strong className="text-gray-900">
+                    {allProducts.length}
                   </strong>{" "}
                   products
                 </p>
@@ -271,16 +244,33 @@ export default function ProductsPage() {
                   <Filter className="w-4 h-4" />
                   Filters
                 </button>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 hidden sm:block">
+                    Sort by:
+                  </span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="text-sm border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+                  >
+                    <option value="featured">Featured</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="discount">Highest Discount</option>
+                    <option value="name">Name A-Z</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* Loading */}
+            {/* Loading State */}
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:grid-cols-3 xl:grid-cols-3 gap-2">
                 {[...Array(6)].map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white rounded-2xl p-4 shadow-sm animate-pulse"
+                    className="bg-white rounded-xl p-4 shadow-sm animate-pulse"
                   >
                     <div className="bg-gray-200 rounded-xl h-48 mb-4"></div>
                     <div className="h-5 bg-gray-200 rounded mb-2"></div>
@@ -291,25 +281,17 @@ export default function ProductsPage() {
             ) : (
               <>
                 {/* Product Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:grid-cols-3 xl:grid-cols-3 gap-2">
-                  {filteredProducts.map((product) => (
-                    <ProductCard
-                      key={product._id}
-                      product={{
-                        ...product,
-                        price: product.displayPrice,
-                        originalPrice: product.price,
-                        discount: product.discount,
-                      }}
-                    />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2">
+                  {sortedProducts.map((product) => (
+                    <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
 
                 {/* No Results */}
-                {filteredProducts.length === 0 && !loading && (
-                  <div className="text-center py-16">
+                {sortedProducts.length === 0 && !loading && (
+                  <div className="text-center py-12">
                     <p className="text-gray-500 text-lg">
-                      No wristbands found matching your filters.
+                      No products found matching your filters.
                     </p>
                     <button
                       onClick={resetFilters}
@@ -320,6 +302,21 @@ export default function ProductsPage() {
                   </div>
                 )}
               </>
+            )}
+
+            {/* Pagination (Optional) */}
+            {sortedProducts.length > 0 && (
+              <div className="flex justify-center mt-12 gap-2">
+                <button className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition">
+                  1
+                </button>
+                <button className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center">
+                  2
+                </button>
+                <button className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition">
+                  3
+                </button>
+              </div>
             )}
           </main>
         </div>

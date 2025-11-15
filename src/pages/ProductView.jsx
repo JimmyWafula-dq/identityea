@@ -1,4 +1,3 @@
-// src/pages/ProductDetail.jsx
 import React, { useEffect, useState } from "react";
 import {
   Heart,
@@ -12,6 +11,15 @@ import { useCart } from "@/context/CartContext";
 import AppLayout from "@/layout/AppLayout";
 import toast from "react-hot-toast";
 import api, { baseUrl } from "@/lib/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useQuoteCart } from "@/context/QuoteCartContext";
 
 // Related Product Card
 const RelatedProductCard = ({ product }) => (
@@ -22,7 +30,7 @@ const RelatedProductCard = ({ product }) => (
   >
     <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
       <img
-        src={`${baseUrl}/${product.image}`}
+        src={`${baseUrl}/${product.image || product.images?.[0]}`}
         alt={product.name}
         className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
       />
@@ -44,11 +52,11 @@ const RelatedProductCard = ({ product }) => (
 
       <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
         <span className="text-xl font-bold text-gray-900">
-          ${product.price}
+          Kes. {product.price}
         </span>
         {product.discount > 0 && (
           <span className="text-gray-500 line-through">
-            ${(product.price + product.discount).toFixed(2)}
+            Kes. {(product.price + product.discount).toFixed(2)}
           </span>
         )}
         {product.discount > 0 && (
@@ -62,13 +70,13 @@ const RelatedProductCard = ({ product }) => (
 );
 
 export default function ProductView() {
-  // ---------- URL & Navigation ----------
-  const { name } = useParams(); // from /view/:name
+  const { name } = useParams();
   const location = useLocation();
   const { product: stateProduct } = location.state || {};
+  const { addQuoteItem } = useQuoteCart();
 
-  // ---------- State ----------
   const [product, setProduct] = useState(null);
+  const [mainImage, setMainImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
@@ -76,11 +84,11 @@ export default function ProductView() {
   const [selectedColor, setSelectedColor] = useState("Green");
   const [selectedSize, setSelectedSize] = useState(42);
   const [quantity, setQuantity] = useState(1);
+  const [selectedTier, setSelectedTier] = useState("");
 
-  // ---------- Cart ----------
   const { addToCart } = useCart();
 
-  // ---------- Fetch Product by Name ----------
+  // Fetch Product by Name
   const fetchProductByName = async (productName) => {
     setLoading(true);
     try {
@@ -98,8 +106,25 @@ export default function ProductView() {
 
       if (found) {
         setProduct(found);
-        // Pre-fill color if available
         if (found.color) setSelectedColor(found.color);
+
+        // Set first image as main
+        const firstImage = found.images?.[0] || found.image;
+        if (firstImage) setMainImage(`${baseUrl}/${firstImage}`);
+
+        // Auto-select first available tier
+        const firstTier =
+          found.category.fixed && found.category.fixed !== ""
+            ? "fixed"
+            : Object.keys(found.category).find(
+                (k) =>
+                  k !== "_id" &&
+                  k !== "name" &&
+                  k !== "fixed" &&
+                  found.category[k] &&
+                  found.category[k] !== ""
+              );
+        setSelectedTier(firstTier || "");
       } else {
         setProduct(null);
       }
@@ -111,7 +136,7 @@ export default function ProductView() {
     }
   };
 
-  // ---------- Fetch Related Products ----------
+  // Fetch Related Products
   const fetchRelatedProducts = async (currentId) => {
     setLoadingRelated(true);
     try {
@@ -135,21 +160,19 @@ export default function ProductView() {
     }
   };
 
-  // ---------- Effect: Load Product ----------
   useEffect(() => {
     if (name) {
       fetchProductByName(name);
     }
   }, [name]);
 
-  // ---------- Effect: Load Related (after product) ----------
   useEffect(() => {
     if (product?._id) {
       fetchRelatedProducts(product._id);
     }
   }, [product]);
 
-  // ---------- Add to Cart ----------
+  // Add to Cart
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -157,7 +180,7 @@ export default function ProductView() {
       id: `${product._id}-${selectedColor}-${selectedSize}`,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: mainImage,
       color: selectedColor,
       size: selectedSize,
       quantity,
@@ -175,11 +198,50 @@ export default function ProductView() {
     );
   };
 
-  // ---------- Static Options ----------
+  // WhatsApp Quote
+  const sendQuoteToWhatsApp = () => {
+    if (!product || !selectedTier) return;
+
+    const tierInfo =
+      product.category.fixed && product.category.fixed !== ""
+        ? { key: "fixed", label: "Fixed Price", price: product.category.fixed }
+        : {
+            key: selectedTier,
+            label: {
+              twotonine: "200 - 999 Pcs",
+              onetonineteen: "1,000 - 1,999 Pcs",
+              twothousandtonine: "2,000 - 9,999 Pcs",
+              tenthousandtotwenty: "10,000 - 20,000 Pcs",
+              printed: "Printed",
+            }[selectedTier],
+            price: product.category[selectedTier],
+          };
+
+    addQuoteItem({
+      productId: product._id,
+      productName: product.name,
+      image: mainImage.split("/").pop(),
+      categoryName: product.category.name,
+      tierKey: tierInfo.key,
+      tierLabel: tierInfo.label,
+      price: Number(tierInfo.price),
+      quantity: 1,
+    });
+
+    const message = encodeURIComponent(
+      `Quote Request\n\n` +
+        `Product: ${product.name}\n` +
+        `Category: ${product.category.name}\n` +
+        `Tier: ${tierInfo.label}\n` +
+        `Price: Kes. ${tierInfo.price}\n\n` +
+        `Please confirm availability.`
+    );
+    window.open(`https://wa.me/?text=${message}`, "_blank");
+  };
+
   const colors = ["Green", "Black", "White", "Gray"];
   const sizes = [40, 41, 42, 43, 44, 45, 46, 47];
 
-  // ---------- Loading / Error ----------
   if (loading) {
     return (
       <AppLayout>
@@ -217,6 +279,13 @@ export default function ProductView() {
     );
   }
 
+  // Get all images
+  const allImages =
+    product.images?.length > 0 ? product.images : [product.image];
+
+  // Check if fixed price exists
+  const hasFixedPrice = product.category.fixed && product.category.fixed !== "";
+
   return (
     <AppLayout>
       {/* Breadcrumb */}
@@ -225,27 +294,60 @@ export default function ProductView() {
           <Link to="/" className="hover:text-black">
             Home
           </Link>{" "}
-          &gt;{" "}
+          >{" "}
           <Link to="/products" className="hover:text-black">
             Products
           </Link>{" "}
-          &gt; <span className="text-black">{product.name}</span>
+          > <span className="text-black">{product.name}</span>
         </nav>
       </div>
 
       {/* Main Section */}
       <section className="max-w-7xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          {/* Image */}
-          <div className="relative group">
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 lg:p-12 flex items-center justify-center overflow-hidden shadow-inner">
-              <img
-                src={`${baseUrl}/${product.image}`}
-                alt={product.name}
-                className="max-h-96 lg:max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
-              />
+          {/* ---------- IMAGE GALLERY ---------- */}
+          <div className="space-y-4">
+            {/* Main Image */}
+            <div className="relative group">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 lg:p-12 flex items-center justify-center overflow-hidden shadow-inner">
+                <img
+                  src={mainImage}
+                  alt={product.name}
+                  className="max-h-96 lg:max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <div className="absolute inset-0 rounded-3xl ring-1 ring-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
-            <div className="absolute inset-0 rounded-3xl ring-1 ring-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+
+            {/* Thumbnails */}
+            {allImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {allImages.map((img, idx) => {
+                  const imgUrl = `${baseUrl}/${img}`;
+                  const isActive = mainImage === imgUrl;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setMainImage(imgUrl)}
+                      className={`relative rounded-xl overflow-hidden transition-all duration-200 ${
+                        isActive
+                          ? "ring-2 ring-black ring-offset-2"
+                          : "ring-1 ring-gray-300 hover:ring-gray-400"
+                      }`}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`${product.name} ${idx + 1}`}
+                        className="w-full h-20 object-cover"
+                      />
+                      {isActive && (
+                        <div className="absolute inset-0 bg-black/10"></div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Info */}
@@ -268,116 +370,187 @@ export default function ProductView() {
               )}
             </div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-gray-900">
-                ${product.price}
-              </span>
-              {product.discount > 0 && (
-                <>
-                  <span className="text-xl text-gray-400 line-through">
-                    ${(product.price + product.discount).toFixed(2)}
+            {/* PRICING SECTION */}
+            <div className="flex flex-col items-baseline gap-3">
+              <div className="flex flex-row items-center gap-2">
+                <span className="text-xl font-bold text-gray-900">Pricing</span>
+                {hasFixedPrice && (
+                  <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                    Fixed
                   </span>
-                  <span className="bg-red-100 text-red-700 text-sm font-semibold px-3 py-1 rounded-full">
-                    {product.discount}% OFF
-                  </span>
-                </>
-              )}
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 w-full gap-4">
+                {hasFixedPrice ? (
+                  // Fixed Price Only
+                  <div className="col-span-2 bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                    <div className="text-sm font-medium text-green-800">
+                      Fixed Price
+                    </div>
+                    <div className="text-lg font-bold text-green-900">
+                      Kes. {product.category.fixed}
+                    </div>
+                  </div>
+                ) : (
+                  // Tiered Pricing
+                  <>
+                    {product.category.twotonine && (
+                      <div className="space-y-1">
+                        <div className="text-sm">200 - 999 Pcs</div>
+                        <div className="text-xs font-medium">
+                          Kes. {product.category.twotonine}
+                        </div>
+                      </div>
+                    )}
+                    {product.category.onetonineteen && (
+                      <div className="space-y-1">
+                        <div className="text-sm">1,000 - 1,999 Pcs</div>
+                        <div className="text-xs font-medium">
+                          Kes. {product.category.onetonineteen}
+                        </div>
+                      </div>
+                    )}
+                    {product.category.twothousandtonine && (
+                      <div className="space-y-1">
+                        <div className="text-sm">2,000 - 9,999 Pcs</div>
+                        <div className="text-xs font-medium">
+                          Kes. {product.category.twothousandtonine}
+                        </div>
+                      </div>
+                    )}
+                    {product.category.tenthousandtotwenty && (
+                      <div className="space-y-1">
+                        <div className="text-sm">10,000 - 20,000 Pcs</div>
+                        <div className="text-xs font-medium">
+                          Kes. {product.category.tenthousandtotwenty}
+                        </div>
+                      </div>
+                    )}
+                    {product.category.printed && (
+                      <div className="space-y-1">
+                        <div className="text-sm text-red-600">Printed</div>
+                        <div className="text-xs font-medium text-red-600">
+                          Kes. {product.category.printed}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
             {product.description && (
-              <p className="text-gray-600 leading-relaxed text-base lg:text-lg">
+              <p className="text-gray-600 leading-relaxed text-base lg:text-md">
                 {product.description}
               </p>
             )}
 
             <hr className="border-gray-200" />
 
-            {/* Color */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Color: <span className="font-normal">{selectedColor}</span>
-              </h3>
-              <div className="flex gap-3">
-                {colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`w-10 h-10 rounded-full border-2 transition-all duration-200 ${
-                      selectedColor === color
-                        ? "border-black ring-2 ring-offset-2 ring-black"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        color === "Green"
-                          ? "#84cc16"
-                          : color === "Black"
-                          ? "#000000"
-                          : color === "White"
-                          ? "#ffffff"
-                          : "#9ca3af",
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Size */}
-            {/* <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Size: <span className="font-normal">{selectedSize}</span>
-              </h3>
-              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                {sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
-                      selectedSize === size
-                        ? "bg-black text-white border-black"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-black"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div> */}
-
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex items-center border border-gray-300 rounded-xl w-fit">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-3 hover:bg-gray-50 transition"
-                >
-                  <ChevronLeft className="w-4 h-4" />
+            {/* QUOTE DIALOG */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="w-full bg-gray-900 text-white py-4 rounded-xl font-semibold hover:bg-black transition-all duration-200">
+                  Get A Quote
                 </button>
-                <span className="px-6 font-medium">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 hover:bg-gray-50 transition"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+              </DialogTrigger>
+              <DialogContent className="bg-white rounded-xl max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Request Quote</DialogTitle>
+                  <DialogDescription className="space-y-4">
+                    <div>
+                      <p className="font-medium">{product.name}</p>
+                      <p className="text-sm text-gray-500">
+                        {product.category.name}
+                      </p>
+                    </div>
 
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 bg-black text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all duration-200 transform active:scale-95"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Add To Cart
-              </button>
+                    {/* Tier Selection */}
+                    {hasFixedPrice ? (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Fixed Price</p>
+                        <label className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                          <input
+                            type="radio"
+                            checked={selectedTier === "fixed"}
+                            onChange={() => setSelectedTier("fixed")}
+                            className="w-4 h-4 text-green-600"
+                          />
+                          <div>
+                            <div className="font-medium">
+                              Kes. {product.category.fixed}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              Fixed Price
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                          Select Quantity Tier
+                        </p>
+                        {[
+                          { key: "twotonine", label: "200 - 999 Pcs" },
+                          { key: "onetonineteen", label: "1,000 - 1,999 Pcs" },
+                          {
+                            key: "twothousandtonine",
+                            label: "2,000 - 9,999 Pcs",
+                          },
+                          {
+                            key: "tenthousandtotwenty",
+                            label: "10,000 - 20,000 Pcs",
+                          },
+                          {
+                            key: "printed",
+                            label: "Printed",
+                            class: "text-red-600",
+                          },
+                        ].map(
+                          (tier) =>
+                            product.category[tier.key] && (
+                              <label
+                                key={tier.key}
+                                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 cursor-pointer transition"
+                              >
+                                <input
+                                  type="radio"
+                                  name="tier"
+                                  checked={selectedTier === tier.key}
+                                  onChange={() => setSelectedTier(tier.key)}
+                                  className="w-4 h-4 text-black"
+                                />
+                                <div>
+                                  <div
+                                    className={`font-medium ${
+                                      tier.class || ""
+                                    }`}
+                                  >
+                                    Kes. {product.category[tier.key]}
+                                  </div>
+                                  <div className="text-xs text-gray-600">
+                                    {tier.label}
+                                  </div>
+                                </div>
+                              </label>
+                            )
+                        )}
+                      </div>
+                    )}
 
-              {/* <button className="px-4 py-4 border border-gray-300 rounded-xl hover:border-black hover:bg-gray-50 transition-all duration-200 group">
-                <Heart className="w-5 h-5 text-gray-600 group-hover:text-red-500 group-hover:fill-red-500 transition-all" />
-              </button> */}
-            </div>
-
-            <button className="w-full bg-gray-900 text-white py-4 rounded-xl font-semibold hover:bg-black transition-all duration-200">
-              Get A quote
-            </button>
+                    <button
+                      onClick={sendQuoteToWhatsApp}
+                      disabled={!selectedTier}
+                      className="w-full mt-4 bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+                    >
+                      Send Quote Request via WhatsApp
+                    </button>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
 
             {/* Trust */}
             <div className="flex items-center gap-6 text-sm text-gray-500 pt-6 border-t border-gray-100">
@@ -402,7 +575,7 @@ export default function ProductView() {
             </div>
 
             <p className="text-xs text-gray-500 mt-4">
-              Free Delivery On Orders Over $200
+              Free Delivery On Orders Over Kes. 20,000
             </p>
           </div>
         </div>

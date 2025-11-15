@@ -43,7 +43,7 @@ export function CartDrawer() {
         </button>
       </DrawerTrigger>
 
-      <DrawerContent className="max-h-screen flex flex-col">
+      <DrawerContent className="max-h-screen flex flex-col bg-white">
         {/* Header */}
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">
@@ -70,7 +70,7 @@ export function CartDrawer() {
             Get Quote
           </Button>
           <DrawerClose asChild>
-            <Button variant="outline" className="w-full mt-2">
+            <Button variant="outline" className="w-full mt-2 rounded-xl">
               Continue Shopping
             </Button>
           </DrawerClose>

@@ -4,11 +4,14 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useApi } from "@/context/ApiContext";
+import { baseUrl } from "@/lib/api";
 import Autoplay from "embla-carousel-autoplay"; // Import the plugin
 import React from "react";
 import { Link } from "react-router-dom";
 
 export default function Hero() {
+  const { categories } = useApi();
   // Create the autoplay plugin instance (reused across carousels)
   const autoplay = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: false })
@@ -127,25 +130,23 @@ export default function Hero() {
           </h3>
 
           <div className="grid grid-cols-3 md:grid-cols-6 gap-4 md:gap-8">
-            {[
-              { name: "Wide Face", img: "/images/Wide-Face-Wristband.webp" },
-              { name: "LShape", img: "/images/LShaped-wristband.webp" },
-              { name: "Fabric", img: "/images/fabric.webp" },
-              { name: "Lanyard", img: "/images/lanyard.webp" },
-              { name: "Id Card", img: "/images/idcard.webp" },
-              { name: "Tyvek", img: "/images/tyvek.webp" },
-            ].map((cat) => (
-              <div
+            {categories.map((cat) => (
+              <a
+                href={`/products?category=${cat.name}`}
                 key={cat.name}
                 className="flex flex-col items-center text-center group cursor-pointer"
               >
                 <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-red-100 transition">
-                  <img src={cat.img} alt={cat.name} className="w-16 h-16" />
+                  <img
+                    src={`${baseUrl}/${cat.image}`}
+                    alt={cat.name}
+                    className="w-16 h-16"
+                  />
                 </div>
                 <p className="text-xs md:text-sm text-gray-700 group-hover:text-green-700">
                   {cat.name}
                 </p>
-              </div>
+              </a>
             ))}
           </div>
         </div>

@@ -6,16 +6,22 @@ import { BrowserRouter } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
+import { ApiProvider } from "./context/ApiContext";
+import { QuoteCartProvider } from "./context/QuoteCartContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <CartProvider>
-        <AuthProvider>
-          <Toaster position="top-center" />
-          <App />
-        </AuthProvider>
-      </CartProvider>
+      <QuoteCartProvider>
+        <CartProvider>
+          <AuthProvider>
+            <ApiProvider>
+              <Toaster position="top-center" />
+              <App />
+            </ApiProvider>
+          </AuthProvider>
+        </CartProvider>
+      </QuoteCartProvider>
     </BrowserRouter>
   </StrictMode>
 );

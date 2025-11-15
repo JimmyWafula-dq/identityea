@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
       {/* Image Container */}
       <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
         <img
-          src={`${baseUrl}/${product.image}`}
+          src={`${baseUrl}/${product.images[0]}`}
           alt={product.name}
           className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
       <div className="space-y-3 w-full">
         {/* Name + Wishlist */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">
+          <h3 className="text-sm font-semibold text-gray-900 truncate">
             {product.name}
           </h3>
           <button
@@ -40,11 +40,11 @@ const ProductCard = ({ product }) => {
         {/* Price & Discount */}
         <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
           <span className="text-xl font-bold text-gray-900">
-            ${product.price}
+            {/* ${product.price} */}
           </span>
           {product.price + product.discount > product.price && (
             <span className="text-gray-500 line-through">
-              ${product.price + product.discount}
+              {/* ${product.price + product.discount} */}
             </span>
           )}
           {product.discount > 0 && (
