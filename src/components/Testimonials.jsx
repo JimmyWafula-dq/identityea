@@ -123,7 +123,7 @@ const Testimonials = () => {
       `}</style>
 
       <div className="w-full flex flex-row justify-center items-center py-8 sm:py-12">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+        <h1 className="text-2xl text-center md:text-4xl font-bold text-gray-900">
           What Event Organizers Say
         </h1>
       </div>

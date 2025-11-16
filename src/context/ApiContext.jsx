@@ -7,6 +7,7 @@ const ApiContext = createContext();
 export const ApiProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [creations, setCreations] = useState([]);
   // api loader
   const [apiloading, setApiLoading] = useState(false);
 
@@ -44,8 +45,24 @@ export const ApiProvider = ({ children }) => {
     };
     getCategories();
   }, []);
+
+  // creations
+  useEffect(() => {
+    const getCreations = async () => {
+      try {
+        setApiLoading(true);
+        const res = await api.get("/creations/allcreations");
+        setCreations(res.data);
+        setApiLoading(false);
+      } catch {
+        setApiLoading(false);
+        toast.error("Failed to load creations");
+      }
+    };
+    getCreations();
+  }, []);
   return (
-    <ApiContext.Provider value={{ categories, banners, apiloading }}>
+    <ApiContext.Provider value={{ categories, banners, apiloading, creations }}>
       {children}
     </ApiContext.Provider>
   );
