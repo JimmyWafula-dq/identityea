@@ -97,9 +97,9 @@ Customization: Full-color printing, sequential numbering, barcodes, or holograms
         />
       </Helmet>
 
-      <div className="max-w-5xl md:py-10 mx-auto flex flex-col md:flex-row items-start justify-center gap-8 px-4 md:px-0">
+      <div className="max-w-7xl md:py-10 mx-auto flex flex-col md:flex-row items-start justify-between gap-2 px-4 md:px-0">
         <img
-          className="max-w-sm w-full rounded-xl h-auto"
+          className="max-w-md w-full rounded-xl h-auto"
           src="/images/band1.jpeg"
           alt="Custom event wristbands and ID cards for festivals and conferences"
         />

@@ -24,18 +24,23 @@ export default function Footer() {
               </h1>
             </a>
             <p className="text-xs mt-6">
-              PrebuiltUI is a free and open-source UI component library with
-              over 300+ beautifully crafted, customizable components built with
-              Tailwind CSS.
+              IdentityEA is a company that specializes in the production of
+              custom wristbands.
             </p>
           </div>
           <div className="flex flex-col lg:items-center lg:justify-center">
             <div className="flex flex-col text-sm space-y-2.5">
               <h2 className="font-semibold mb-5 text-gray-800">Company</h2>
-              <a className="hover:text-slate-600 transition text-xs" href="#">
+              <a
+                className="hover:text-slate-600 transition text-xs"
+                href="/about"
+              >
                 About us
               </a>
-              <a className="hover:text-slate-600 transition text-xs" href="#">
+              <a
+                className="hover:text-slate-600 transition text-xs"
+                href="/products"
+              >
                 Shop
                 <span className="text-xs text-white bg-black rounded-md ml-2 px-2 py-1">
                   Buy Now

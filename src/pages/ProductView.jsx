@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
+  ArrowRight,
 } from "lucide-react";
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
@@ -22,52 +23,173 @@ import {
 import { useQuoteCart } from "@/context/QuoteCartContext";
 
 // Related Product Card
-const RelatedProductCard = ({ product }) => (
-  <Link
-    to={`/view/${encodeURIComponent(product.name)}`}
-    key={product._id}
-    className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out w-full"
-  >
-    <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
-      <img
-        src={`${baseUrl}/${product.image || product.images?.[0]}`}
-        alt={product.name}
-        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
-    </div>
+// const RelatedProductCard = ({ product }) => (
+//   <Link
+//     to={`/view/${encodeURIComponent(product.name)}`}
+//     key={product._id}
+//     className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out w-full"
+//   >
+//     <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
+//       <img
+//         src={`${baseUrl}/${product.image || product.images?.[0]}`}
+//         alt={product.name}
+//         className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+//       />
+//       <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+//     </div>
 
-    <div className="space-y-3 w-full">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 truncate">
-          {product.name}
-        </h3>
-        <button
-          className="text-gray-400 hover:text-red-500 transition-colors duration-200"
-          aria-label="Add to wishlist"
-        >
-          <Heart className="w-5 h-5" />
-        </button>
+//     <div className="space-y-3 w-full">
+//       <div className="flex items-center justify-between">
+//         <h3 className="text-lg font-semibold text-gray-900 truncate">
+//           {product.name}
+//         </h3>
+//         <button
+//           className="text-gray-400 hover:text-red-500 transition-colors duration-200"
+//           aria-label="Add to wishlist"
+//         >
+//           <Heart className="w-5 h-5" />
+//         </button>
+//       </div>
+
+//       <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
+//         <span className="text-xl font-bold text-gray-900">
+//           Kes. {product.price}
+//         </span>
+//         {product.discount > 0 && (
+//           <span className="text-gray-500 line-through">
+//             Kes. {(product.price + product.discount).toFixed(2)}
+//           </span>
+//         )}
+//         {product.discount > 0 && (
+//           <span className="text-red-600 font-medium">
+//             {product.discount}% off
+//           </span>
+//         )}
+//       </div>
+//     </div>
+//   </Link>
+// );
+
+// import { baseUrl } from "@/lib/api";
+// import { Heart } from "lucide-react";
+// import React from "react";
+// import { Link } from "react-router-dom";
+
+// const ProductCard = ({ product }) => {
+//   return (
+//     <Link
+//       to={`/view/${encodeURIComponent(product.name)}`}
+//       state={{ product }} // still works for internal navigation
+//       key={product._id}
+//       className="group flex flex-col items-center text-center bg-white ring-1 ring-gray-200 rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out  w-full"
+//     >
+//       {/* Image Container */}
+//       <div className="bg-gray-50 rounded-xl p-6 mb-4 w-full h-48 flex items-center justify-center overflow-hidden relative">
+//         <img
+//           src={`${baseUrl}/${product.images[0]}`}
+//           alt={product.name}
+//           className="max-h-full max-w-full object-cover transition-transform duration-300 group-hover:scale-105"
+//         />
+//         {/* Overlay for hover effect */}
+//         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+//       </div>
+
+//       {/* Product Info */}
+//       <div className="space-y-3 w-full">
+//         {/* Name + Wishlist */}
+//         <div className="flex items-center justify-between">
+//           <h3 className="text-sm font-semibold text-gray-900 truncate">
+//             {product.name}
+//           </h3>
+//           <button
+//             className="text-gray-400 hover:text-red-500 transition-colors duration-200"
+//             aria-label="Add to wishlist"
+//           >
+//             <Heart className="w-5 h-5" />
+//           </button>
+//         </div>
+
+//         {/* Price & Discount */}
+//         <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
+//           <span className="text-xl font-bold text-gray-900">
+//             {/* ${product.price} */}
+//           </span>
+//           {product.price + product.discount > product.price && (
+//             <span className="text-gray-500 line-through">
+//               {/* ${product.price + product.discount} */}
+//             </span>
+//           )}
+//           {product.discount > 0 && (
+//             <span className="text-red-600 font-medium">
+//               {product.discount}% off
+//             </span>
+//           )}
+//         </div>
+//       </div>
+//     </Link>
+//   );
+// };
+
+// export default ProductCard;
+
+const RelatedProductCard = ({ product }) => {
+  // Safely get first image
+  const firstImage = product.images?.[0] || product.image;
+
+  return (
+    <Link
+      to={`/view/${encodeURIComponent(product.name)}`}
+      state={{ product }}
+      key={product._id}
+      className="group block w-full overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 transition-all duration-300 hover:shadow-xl hover:ring-gray-300"
+    >
+      {/* Full-Bleed Image (No Padding) */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+        {firstImage ? (
+          <img
+            src={`${baseUrl}/${firstImage}`}
+            alt={product.name}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gray-50">
+            <span className="text-sm text-gray-400">No image</span>
+          </div>
+        )}
+
+        {/* Subtle Overlay on Hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
-      <div className="flex items-center justify-center md:justify-start gap-3 text-sm">
-        <span className="text-xl font-bold text-gray-900">
-          Kes. {product.price}
-        </span>
-        {product.discount > 0 && (
-          <span className="text-gray-500 line-through">
-            Kes. {(product.price + product.discount).toFixed(2)}
+      {/* Content Section */}
+      <div className="p-4 space-y-2">
+        {/* Name + Wishlist */}
+        <div className="flex items-center justify-between">
+          <h3 className="truncate text-sm font-semibold text-gray-900">
+            {product.name}
+          </h3>
+          <button
+            className="text-gray-400 transition-colors hover:text-red-500"
+            aria-label="Add to wishlist"
+            onClick={(e) => e.preventDefault()} // Prevent navigation on click
+          >
+            <Heart className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Price & Discount */}
+        <div className="flex items-center gap-2 text-sm">
+          <span className="font-normal text-gray-900">
+            {/* view button */}
+            <button className="px-5 py-2 w-full rounded-full bg-black text-white hover:bg-black/25 transition">
+              View
+            </button>
           </span>
-        )}
-        {product.discount > 0 && (
-          <span className="text-red-600 font-medium">
-            {product.discount}% off
-          </span>
-        )}
+        </div>
       </div>
-    </div>
-  </Link>
-);
+    </Link>
+  );
+};
 
 export default function ProductView() {
   const { name } = useParams();
@@ -229,14 +351,17 @@ export default function ProductView() {
     });
 
     const message = encodeURIComponent(
-      `Quote Request\n\n` +
-        `Product: ${product.name}\n` +
-        `Category: ${product.category.name}\n` +
-        `Tier: ${tierInfo.label}\n` +
-        `Price: Kes. ${tierInfo.price}\n\n` +
-        `Please confirm availability.`
+      `🛍️ *Quote Request* 🛍️\n\n` +
+        `*Product:* ${product.name}\n` +
+        `*Category:* ${product.category.name}\n` +
+        `*Tier:* ${tierInfo.label}\n` +
+        `Please confirm availability and lead time.\n\n` +
+        `🔗 View on website: https://identityea.com/view/${encodeURIComponent(
+          product.name
+        )}\n\n` +
+        `Thank you! 🙏`
     );
-    window.open(`https://wa.me/?text=${message}`, "_blank");
+    window.open(`https://wa.me/254720575757?text=${message}`, "_blank");
   };
 
   const colors = ["Green", "Black", "White", "Gray"];
@@ -290,15 +415,16 @@ export default function ProductView() {
     <AppLayout>
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <nav className="text-sm text-gray-500">
+        <nav className="text-sm text-gray-500 flex flex-row">
           <Link to="/" className="hover:text-black">
             Home
           </Link>{" "}
-          >{" "}
+          <ChevronRight className="text-neutral-500" size={18} />{" "}
           <Link to="/products" className="hover:text-black">
             Products
           </Link>{" "}
-          > <span className="text-black">{product.name}</span>
+          <ChevronRight className="text-neutral-500" size={18} />{" "}
+          <span className="text-black">{product.name}</span>
         </nav>
       </div>
 
@@ -309,11 +435,11 @@ export default function ProductView() {
           <div className="space-y-4">
             {/* Main Image */}
             <div className="relative group">
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 lg:p-12 flex items-center justify-center overflow-hidden shadow-inner">
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl  flex items-center justify-center overflow-hidden shadow-inner">
                 <img
                   src={mainImage}
                   alt={product.name}
-                  className="max-h-96 lg:max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                  className="max-h-96 lg:max-h-full rounded-xl object-contain transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="absolute inset-0 rounded-3xl ring-1 ring-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -356,7 +482,7 @@ export default function ProductView() {
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
-              {product.color && (
+              {/* {product.color && (
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm text-gray-600">Color:</span>
                   <div
@@ -367,7 +493,7 @@ export default function ProductView() {
                     {product.color}
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* PRICING SECTION */}

@@ -2,14 +2,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://identityea.com/api", // Change in production
+  baseURL: "https://server.identityea.com/api", // Change in production
   // baseURL: "http://localhost:5000/api", // Change in production
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-export const baseUrl = "https://identityea.com/uploads";
+export const baseUrl = "https://server.identityea.com/uploads";
 // export const baseUrl = "http://localhost:5000/uploads";
 
 // Add JWT to every request

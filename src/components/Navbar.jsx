@@ -41,7 +41,7 @@ const Navbar = () => {
 
           {/* Desktop actions (only visible on md+) */}
           <div className="hidden md:flex items-center gap-4">
-            <CartDrawer />
+            {/* <CartDrawer /> */}
             {user ? (
               <button
                 onClick={logout}
@@ -150,7 +150,7 @@ const Navbar = () => {
 
         {/* Cart & Auth (inside mobile menu) */}
         <div className="mt-10 flex flex-col gap-4">
-          <CartDrawer />
+          {/* <CartDrawer /> */}
           {user ? (
             <button
               onClick={() => {
